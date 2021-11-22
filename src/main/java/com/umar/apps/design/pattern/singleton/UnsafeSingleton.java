@@ -1,10 +1,10 @@
 package com.umar.apps.design.pattern.singleton;
 
-import java.io.Serializable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.umar.apps.util.ThrowingConsumer;
 
-public class UnsafeSingleton extends Clone implements Serializable {
+import java.io.Serializable;
+
+public final class UnsafeSingleton extends Clone implements Serializable {
     
     public static int count = 0;
     
@@ -22,11 +22,7 @@ public class UnsafeSingleton extends Clone implements Serializable {
      */
     public static UnsafeSingleton getInstance() {
         if(null == instance) {
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(UnsafeSingleton.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            ThrowingConsumer.unchecked(throwable -> Thread.sleep(10)).accept(UnsafeSingleton.class);
             synchronized(UnsafeSingleton.class) {
                 ++count;
                 instance = new UnsafeSingleton();

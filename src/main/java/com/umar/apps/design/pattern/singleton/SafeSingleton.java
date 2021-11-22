@@ -1,11 +1,14 @@
 package com.umar.apps.design.pattern.singleton;
 
+import com.umar.apps.util.ThrowingConsumer;
+import com.umar.apps.util.ThrowingFunction;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class SafeSingleton extends Clone implements Serializable {
+public final class SafeSingleton extends Clone implements Serializable {
     
     public static int count = 0;
     
@@ -22,19 +25,12 @@ public class SafeSingleton extends Clone implements Serializable {
 
     public static SafeSingleton getInstance() {
         if(null == instance) {
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(SafeSingleton.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            ThrowingConsumer.unchecked(throwable -> Thread.sleep(10)).accept(SafeSingleton.class);
             synchronized (SafeSingleton.class) {
                 if(null == instance) {
                     ++count;
-                    try {
-                        instance = new SafeSingleton();
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
-                    }
+                    ThrowingFunction.unchecked(throwable -> instance = new SafeSingleton())
+                            .apply(SafeSingleton.class);
                 }
             }
         }
