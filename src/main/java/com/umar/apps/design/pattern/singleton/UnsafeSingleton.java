@@ -1,7 +1,5 @@
 package com.umar.apps.design.pattern.singleton;
 
-import com.umar.apps.util.ThrowingConsumer;
-
 import java.io.Serializable;
 import java.util.function.Supplier;
 
