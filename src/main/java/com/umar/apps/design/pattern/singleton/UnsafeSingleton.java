@@ -35,7 +35,11 @@ public final class UnsafeSingleton extends Clone implements Serializable {
     public String display() {
         return "Unsafe Singleton";
     }
-    
+
+    /**
+     * Methods are always serialized in .class
+     * @return Returns a {@link Supplier<Integer>}
+     */
     public Supplier<Integer> sharedResourceSupplier(){
         return () -> 5;
     }
