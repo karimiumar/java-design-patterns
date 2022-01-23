@@ -10,8 +10,6 @@ import java.util.logging.Logger;
 
 public final class SafeSingleton extends Clone implements Serializable {
     
-    public static int count = 0;
-    
     //We can use class check to make sure, the private constructor is not accessed from any other class.
     private SafeSingleton() throws IllegalAccessException {
         StackWalker walker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
@@ -28,7 +26,6 @@ public final class SafeSingleton extends Clone implements Serializable {
             ThrowingConsumer.unchecked(throwable -> Thread.sleep(10)).accept(SafeSingleton.class);
             synchronized (SafeSingleton.class) {
                 if(null == instance) {
-                    ++count;
                     ThrowingFunction.unchecked(throwable -> instance = new SafeSingleton())
                             .apply(SafeSingleton.class);
                 }
@@ -47,7 +44,7 @@ public final class SafeSingleton extends Clone implements Serializable {
     }
 
     @Serial
-    protected Object readResolve() {
+    private Object readResolve() {
         return instance;
     }
 

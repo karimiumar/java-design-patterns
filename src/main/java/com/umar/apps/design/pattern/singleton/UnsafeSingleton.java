@@ -3,16 +3,15 @@ package com.umar.apps.design.pattern.singleton;
 import com.umar.apps.util.ThrowingConsumer;
 
 import java.io.Serializable;
+import java.util.function.Supplier;
 
 public final class UnsafeSingleton extends Clone implements Serializable {
-    
-    public static int count = 0;
-    
+	
     private UnsafeSingleton() {
         
     }
     
-    private static volatile UnsafeSingleton instance;
+    static volatile UnsafeSingleton instance;
     
     /**
      * Multiple threads can create more than one instance.
@@ -22,9 +21,8 @@ public final class UnsafeSingleton extends Clone implements Serializable {
      */
     public static UnsafeSingleton getInstance() {
         if(null == instance) {
-            ThrowingConsumer.unchecked(throwable -> Thread.sleep(10)).accept(UnsafeSingleton.class);
             synchronized(UnsafeSingleton.class) {
-                ++count;
+                System.out.println(Thread.currentThread().getName() + " is creating an instance.");
                 instance = new UnsafeSingleton();
             }
         }
@@ -38,5 +36,9 @@ public final class UnsafeSingleton extends Clone implements Serializable {
      */
     public String display() {
         return "Unsafe Singleton";
+    }
+    
+    public Supplier<Integer> sharedResourceSupplier(){
+        return () -> 5;
     }
 }

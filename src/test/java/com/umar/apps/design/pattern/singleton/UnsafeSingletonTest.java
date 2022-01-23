@@ -6,6 +6,12 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 
@@ -47,16 +53,20 @@ public class UnsafeSingletonTest {
     
     
     @Test
-    void when_multiple_threads_access_getInstance_Of_UnsafeSingleton_then_multiple_instances() throws InterruptedException {
-       
-        Thread t1 = new Thread(UnsafeSingleton::getInstance);
-        Thread t2 = new Thread(UnsafeSingleton::getInstance);
-        Thread t3 = new Thread(UnsafeSingleton::getInstance);
-        t1.start();
-        t2.start();
-        t3.start();
-        t1.join();
-        t2.join();
-        assertThat(UnsafeSingleton.count).isGreaterThanOrEqualTo(1);
+    void when_multiple_threads_access_getInstance_Of_UnsafeSingleton_then_multiple_instances() throws InterruptedException, ExecutionException {
+        Callable<UnsafeSingleton> c  = UnsafeSingleton::getInstance;
+        var es = Executors.newFixedThreadPool(2);
+        int count = 0;
+        for(int i= 0; i<50;i++) {
+            Future<UnsafeSingleton> f1 = es.submit(c);
+            Future<UnsafeSingleton> f2 = es.submit(c);
+            if(f1.get() != f2.get()) {
+                System.out.println("Multiple Instances!!!");
+                ++count;
+                assertThat(f1.get()).isNotEqualTo(f2.get());
+            }
+            UnsafeSingleton.instance = null;
+        }
+        assertThat(count).isNotEqualTo(0);
     }
 }
